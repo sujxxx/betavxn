@@ -129,7 +129,7 @@ button{
 <div id="container"></div>
 
 <script>
-const rawData = `
+const rawData = ` 
 https://pd.1drv.eu.org/oc4wS6kU Blacked - 2024.11.19 Nicole Kitt Stacy Cruz - 4K.mp4
 https://pd.1drv.eu.org/zfuVmwKA Blacked - 2024.08.31 Molly Little - 4K.mp4
 https://pd.1drv.eu.org/grCENkK2 Tushy - 2022.05.15 April Olsen - 4K.mp4
@@ -165,7 +165,7 @@ function parseData() {
         const date = dateMatch ? new Date(dateMatch[0].replaceAll(".", "-")) : null;
         const year = date ? date.getFullYear() : "Unknown";
         const model = title.split("-")[2]?.replace("4K.mp4", "").trim() || "Unknown";
-        const studio = title.split("-")[0].trim(); // Assuming studio is the first part of the title
+        const studio = title.split("-")[0].trim();
         return { url, title, date, year, model, studio };
     });
 }
@@ -229,7 +229,7 @@ function render() {
                 <div class="meta">${v.year} • ${v.model} • ${v.studio}</div>
             </div>
             <div class="actions">
-                <button onclick="openDirect('${v.url}')">Open</button>
+                <button onclick="openDirect('${v.url}')">Play</button>
                 <button onclick="navigator.clipboard.writeText('${v.url}')">Copy</button>
             </div>
         `;
@@ -252,11 +252,23 @@ function render() {
 }
 
 function openDirect(url) {
-    const win = window.open();
-    if (win) {
-        win.opener = null;
-        win.location.href = url;
-    }
+    const container = document.getElementById("container");
+    const videoPlayer = document.createElement("video");
+    videoPlayer.setAttribute("controls", "true");
+    videoPlayer.setAttribute("width", "100%");
+    videoPlayer.setAttribute("height", "auto");
+
+    const source = document.createElement("source");
+    source.setAttribute("src", url);
+    source.setAttribute("type", "video/mp4");
+
+    videoPlayer.appendChild(source);
+
+    container.innerHTML = '';  // Clear current content
+    container.appendChild(videoPlayer);  // Append the video player
+
+    // Play the video
+    videoPlayer.play();
 }
 
 function randomOpen() {
