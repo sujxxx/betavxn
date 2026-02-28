@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VXN Stream 2026</title>
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+    --bg: #1a1a1a;
+    --card: #333;
+    --accent: #4e73df;
+    --accent2: #2a9d8f;
+    --text: #eaeaea;
+}
+
+body{
+    margin:0;
+    font-family:Inter,Segoe UI,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:40px;
+    transition:.4s;
+}
+
+h1{
+    font-size:32px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.controls{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:10px;
+    margin:20px 0;
+}
+
+input,select{
+    padding:10px;
+    border-radius:10px;
+    border:none;
+    font-size:14px;
+    background:var(--card);
+    color:var(--text);
+}
+
+button{
+    border:none;
+    padding:10px;
+    border-radius:10px;
+    cursor:pointer;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:white;
+    font-weight:600;
+}
+
+.card{
+    background:var(--card);
+    padding:16px;
+    margin-bottom:12px;
+    border-radius:16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:.25s;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(0,0,0,.4);
+}
+
+.meta{
+    font-size:12px;
+    opacity:.6;
+}
+
+.actions button{
+    background:#334155;
+    margin-left:6px;
+}
+
+.counter{
+    margin:10px 0;
+    opacity:.7;
+}
+
+.fade-in{
+    animation:fade .3s ease;
+}
+
+@keyframes fade{
+    from{opacity:0;transform:translateY(5px)}
+    to{opacity:1;transform:translateY(0)}
+}
+</style>
+</head>
+
+<body>
+
+<h1>VXN Stream 2026</h1>
+
+<div class="controls">
+<input id="searchBox" placeholder="Search title...">
+<select id="yearFilter"></select>
+<input id="modelFilter" placeholder="Filter model name...">
+<select id="studioFilter"></select> <!-- New filter by studio -->
+<select id="sortSelect">
+<option value="date_desc">Date ↓</option>
+<option value="date_asc">Date ↑</option>
+<option value="model_asc">Model A-Z</option>
+<option value="model_desc">Model Z-A</option>
+</select>
+<select id="themeSelect">
+<option value="">Default</option>
+<option value="theme-neon">Neon Cyber</option>
+<option value="theme-glass">Glass</option>
+<option value="theme-sunset">Sunset</option>
+<option value="theme-emerald">Emerald</option>
+<option value="theme-minimal">Minimal Dark</option>
+</select>
+<button onclick="randomOpen()">🎲 Random</button>
+</div>
+
+<div class="counter" id="counter"></div>
+<div id="container"></div>
+
+<script>
+const rawData = `
+https://pd.1drv.eu.org/oc4wS6kU Blacked - 2024.11.19 Nicole Kitt Stacy Cruz - 4K.mp4
+https://pd.1drv.eu.org/zfuVmwKA Blacked - 2024.08.31 Molly Little - 4K.mp4
+https://pd.1drv.eu.org/grCENkK2 Tushy - 2022.05.15 April Olsen - 4K.mp4
+https://pd.1drv.eu.org/XeeMgiqJ Tushy - 2022.05.29 Hazel Moore - 4K.mp4
+https://pd.1drv.eu.org/vvGNT3Pp Tushy - 2022.06.05 Madison Summers - 4K.mp4
+https://pd.1drv.eu.org/vaPYY1D8 Tushy - 2022.06.12 Gianna Dior And Liya Silver - 4K.mp4
+https://pd.1drv.eu.org/k8NUNnJo Vixen - 2019.11.30 Georgia Jones, Mick Blue - Vivid Imagination.mp4
+https://pd.1drv.eu.org/3pnLij4S Vixen - 2019.12.05 Kenna James, Christian Clay - Travelling Together.mp4
+https://pd.1drv.eu.org/RW1X8Lrx Vixen - 2019.12.10 Jia Lissa, Oxana Chic, Alberto Blanco - Let Me In.mp4
+https://pd.1drv.eu.org/cm69X8bN Vixen - 2019.12.15 Vikalita, Alberto Blanco - No Time To Unpack.mp4
+https://pd.1drv.eu.org/kQ2sde6e Vixen - 2019.12.20 Sybil, Lika Star, Christian Clay - Body Warmth.mp4
+https://pd.1drv.eu.org/fPjPed7c Vixen - 2019.12.25 Emily Willis, Little Caprice, Apolonia Lapiedra, Alberto Blanco - Better Together.mp4
+https://pd.1drv.eu.org/B8Es77WK Vixen - 2019.12.30 Lexi Belle, Alberto Blanco - Give In.mp4
+https://pd.1drv.eu.org/HXSECMd9/I%20Only%20Want%20Sex-%20BLACKED.mp4 Blacked - Nicole Aniston 2017
+https://pd.1drv.eu.org/HXSECMd9/I%20Only%20Want%20Sex-%20Part%204-%20BLACKED.mp4 Blacked - Nicole Aniston 2019
+https://pd.1drv.eu.org/HXSECMd9/Up%20For%20Anything-%20BLACKED.mp4 Blacked - Natalia Starr - Up for Anything
+
+https://fileditchfiles.me/file.php?f=/b71/DrKHCOBOSvMdhRORzuFw.mp4 Tushy - 2023.01.01 Jennifer White - 4K.mp4
+https://fileditchfiles.me/file.php?f=/b71/OUfgokSwyZMdIuEehWfa.mp4 Tushy - 2023.01.08 Vanessa Alessia - 4K.mp4
+`;
+
+let videos = [];
+let currentPage = 1;
+const resultsPerPage = 30;
+
+function parseData() {
+    const lines = rawData.trim().split("\n");
+    videos = lines.map(line => {
+        const parts = line.split(" ");
+        const url = parts[0];
+        const title = parts.slice(1).join(" ");
+        const dateMatch = title.match(/\d{4}\.\d{2}\.\d{2}/);
+        const date = dateMatch ? new Date(dateMatch[0].replaceAll(".", "-")) : null;
+        const year = date ? date.getFullYear() : "Unknown";
+        const model = title.split("-")[2]?.replace("4K.mp4", "").trim() || "Unknown";
+        const studio = title.split("-")[0].trim(); // Assuming studio is the first part of the title
+        return { url, title, date, year, model, studio };
+    });
+}
+
+function populateYears() {
+    const years = [...new Set(videos.map(v => v.year))].sort((a, b) => b - a);
+    const select = document.getElementById("yearFilter");
+    select.innerHTML = "<option value=''>All Years</option>";
+    years.forEach(y => {
+        select.innerHTML += `<option value="${y}">${y}</option>`;
+    });
+}
+
+function populateStudios() {
+    const studios = [...new Set(videos.map(v => v.studio))].sort();
+    const select = document.getElementById("studioFilter");
+    select.innerHTML = "<option value=''>All Studios</option>";
+    studios.forEach(studio => {
+        select.innerHTML += `<option value="${studio}">${studio}</option>`;
+    });
+}
+
+function render() {
+    const container = document.getElementById("container");
+    container.innerHTML = "";
+
+    let filtered = [...videos];
+
+    const search = document.getElementById("searchBox").value.toLowerCase();
+    const year = document.getElementById("yearFilter").value;
+    const model = document.getElementById("modelFilter").value.toLowerCase();
+    const studio = document.getElementById("studioFilter").value;
+    const sort = document.getElementById("sortSelect").value;
+
+    // Smarter Search Logic
+    const searchKeywords = search.split(" ").filter(keyword => keyword.trim().length > 0);
+    filtered = filtered.filter(v => {
+        return searchKeywords.every(keyword => v.title.toLowerCase().includes(keyword.toLowerCase())) &&
+               (!year || v.year == year) &&
+               (!model || v.model.toLowerCase().includes(model)) &&
+               (!studio || v.studio.toLowerCase().includes(studio.toLowerCase()));
+    });
+
+    // Sorting Logic
+    if (sort === "date_desc") filtered.sort((a, b) => b.date - a.date);
+    if (sort === "date_asc") filtered.sort((a, b) => a.date - b.date);
+    if (sort === "model_asc") filtered.sort((a, b) => a.model.localeCompare(b.model));
+    if (sort === "model_desc") filtered.sort((a, b) => b.model.localeCompare(a.model));
+
+    // Paginate Results
+    const startIndex = (currentPage - 1) * resultsPerPage;
+    const endIndex = startIndex + resultsPerPage;
+    filtered = filtered.slice(startIndex, endIndex);
+
+    filtered.forEach(v => {
+        const card = document.createElement("div");
+        card.className = "card fade-in";
+        card.innerHTML = `
+            <div>
+                <div><strong>${v.title}</strong></div>
+                <div class="meta">${v.year} • ${v.model} • ${v.studio}</div>
+            </div>
+            <div class="actions">
+                <button onclick="openDirect('${v.url}')">Open</button>
+                <button onclick="navigator.clipboard.writeText('${v.url}')">Copy</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+
+    document.getElementById("counter").innerText = `${filtered.length} results`;
+
+    // Handle pagination
+    const totalPages = Math.ceil(filtered.length / resultsPerPage);
+    if (currentPage < totalPages) {
+        const nextButton = document.createElement("button");
+        nextButton.innerText = "Next Page";
+        nextButton.onclick = () => {
+            currentPage++;
+            render();
+        };
+        container.appendChild(nextButton);
+    }
+}
+
+function openDirect(url) {
+    const win = window.open();
+    if (win) {
+        win.opener = null;
+        win.location.href = url;
+    }
+}
+
+function randomOpen() {
+    const visible = [...document.querySelectorAll(".card")];
+    if (!visible.length) return;
+    visible[Math.floor(Math.random() * visible.length)]
+        .querySelector("button").click();
+}
+
+document.querySelectorAll("input,select").forEach(el => {
+    el.addEventListener("input", render);
+});
+
+document.getElementById("themeSelect").addEventListener("change", e => {
+    document.body.className = e.target.value;
+    localStorage.setItem("theme", e.target.value);
+});
+
+window.onload = () => {
+    parseData();
+    populateYears();
+    populateStudios(); // Populate studio filter
+    render();
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+        document.body.className = savedTheme;
+        document.getElementById("themeSelect").value = savedTheme;
+    }
+};
+</script>
+
+</body>
+</html>
